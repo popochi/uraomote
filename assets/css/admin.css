@@ -1,0 +1,59 @@
+/**
+ * 比較ランキング表 - 管理画面用スタイル
+ */
+
+.mct-admin-meta-box {
+    padding: 10px 0;
+}
+
+.mct-admin-meta-box .form-table th {
+    width: 150px;
+    padding-left: 0;
+}
+
+.mct-admin-meta-box .form-table td {
+    padding-left: 0;
+}
+
+.mct-rating-preview {
+    color: #ffd700;
+    font-size: 18px;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+/* 商品一覧ページ */
+.column-mct_price,
+.column-mct_rating,
+.column-mct_order {
+    width: 80px;
+}
+
+.column-mct_tags {
+    width: 150px;
+}
+
+/* 設定ページ */
+.wrap h2 {
+    margin-top: 30px;
+}
+
+.wrap table.widefat {
+    margin-top: 15px;
+}
+
+.wrap table.widefat code {
+    background: #f0f0f0;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+/* カラーピッカー調整 */
+.wp-picker-container {
+    display: inline-block;
+}
+
+.wp-picker-container .wp-color-result {
+    margin-right: 10px;
+}
