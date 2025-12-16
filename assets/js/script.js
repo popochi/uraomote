@@ -290,7 +290,8 @@
             }
         });
 
-        var visibleCount = 0;
+        var visibleItems = [];
+        var hiddenItems = [];
 
         items.forEach(function (item) {
             var itemTags = item.getAttribute('data-tags').split(',').filter(function (t) {
@@ -299,9 +300,7 @@
 
             // タグが選択されていない場合は全て表示
             if (selectedTags.length === 0) {
-                item.classList.remove('hidden');
-                item.style.display = '';
-                visibleCount++;
+                visibleItems.push(item);
                 return;
             }
 
@@ -311,23 +310,70 @@
             });
 
             if (hasAllTags) {
-                item.classList.remove('hidden');
-                item.style.display = '';
-                visibleCount++;
+                visibleItems.push(item);
             } else {
-                item.classList.add('hidden');
-                item.style.display = 'none';
+                hiddenItems.push(item);
             }
         });
 
-        // 該当なしメッセージの表示/非表示
-        if (noResults) {
-            if (visibleCount === 0) {
-                noResults.style.display = 'block';
-            } else {
-                noResults.style.display = 'none';
+        // 非表示アイテム: スケールダウンしながらフェードアウト
+        hiddenItems.forEach(function (item) {
+            item.style.transition = 'opacity 0.25s ease-out, transform 0.25s ease-out';
+            item.style.opacity = '0';
+            item.style.transform = 'scale(0.95)';
+        });
+
+        // アニメーション後に非表示
+        setTimeout(function () {
+            hiddenItems.forEach(function (item) {
+                item.classList.add('hidden');
+                item.style.display = 'none';
+                item.style.transition = '';
+                item.style.opacity = '';
+                item.style.transform = '';
+            });
+
+            // 表示アイテム: 順次フェードイン
+            visibleItems.forEach(function (item, index) {
+                var wasHidden = item.classList.contains('hidden');
+                item.classList.remove('hidden');
+                item.style.display = '';
+
+                if (wasHidden) {
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateY(20px)';
+
+                    setTimeout(function () {
+                        item.style.transition = 'opacity 0.4s ease-out, transform 0.4s ease-out';
+                        item.style.opacity = '1';
+                        item.style.transform = 'translateY(0)';
+
+                        // アニメーション完了後にスタイルをクリア
+                        setTimeout(function () {
+                            item.style.transition = '';
+                            item.style.opacity = '';
+                            item.style.transform = '';
+                        }, 400);
+                    }, index * 60);
+                }
+            });
+
+            // 該当なしメッセージの表示/非表示
+            if (noResults) {
+                if (visibleItems.length === 0) {
+                    noResults.style.display = 'block';
+                    noResults.style.opacity = '0';
+                    noResults.style.transform = 'translateY(10px)';
+                    setTimeout(function () {
+                        noResults.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+                        noResults.style.opacity = '1';
+                        noResults.style.transform = 'translateY(0)';
+                    }, 50);
+                } else {
+                    noResults.style.display = 'none';
+                }
             }
-        }
+        }, 250);
     }
 
     /**
