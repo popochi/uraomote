@@ -178,6 +178,33 @@
     display: none;
 }
 
+/* ソート・フィルター時のフェードアニメーション */
+.my_comparison_item {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.my_comparison_item.fade-out {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+
+.my_comparison_item.fade-in {
+    animation: fadeInUp 0.4s ease-out forwards;
+}
+
 /* ==========================================================================
    順位
    ========================================================================== */
@@ -631,6 +658,9 @@
     display: flex;
     gap: 0.5rem;
     overflow-x: auto;
+    overflow-y: visible;
+    padding-top: 0.5rem;
+    /* ホバー時の浮き上がり用余白 */
     padding-bottom: 0.25rem;
     scrollbar-width: thin;
     scrollbar-color: var(--mct-border-color) transparent;

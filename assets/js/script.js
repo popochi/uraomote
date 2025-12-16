@@ -230,31 +230,48 @@
     function sortItems(container, items, field, order) {
         var itemsArray = Array.from(items);
 
-        itemsArray.sort(function (a, b) {
-            var aVal, bVal;
-
-            if (field === 'rank') {
-                aVal = parseInt(a.getAttribute('data-original-rank'), 10);
-                bVal = parseInt(b.getAttribute('data-original-rank'), 10);
-            } else if (field === 'price') {
-                aVal = parseFloat(a.getAttribute('data-price')) || 0;
-                bVal = parseFloat(b.getAttribute('data-price')) || 0;
-            } else if (field === 'rating') {
-                aVal = parseFloat(a.getAttribute('data-rating')) || 0;
-                bVal = parseFloat(b.getAttribute('data-rating')) || 0;
-            }
-
-            if (order === 'asc') {
-                return aVal - bVal;
-            } else {
-                return bVal - aVal;
-            }
-        });
-
-        // DOMを再配置
+        // フェードアウト
         itemsArray.forEach(function (item) {
-            container.appendChild(item);
+            item.classList.add('fade-out');
         });
+
+        // アニメーション完了後に並び替え
+        setTimeout(function () {
+            itemsArray.sort(function (a, b) {
+                var aVal, bVal;
+
+                if (field === 'rank') {
+                    aVal = parseInt(a.getAttribute('data-original-rank'), 10);
+                    bVal = parseInt(b.getAttribute('data-original-rank'), 10);
+                } else if (field === 'price') {
+                    aVal = parseFloat(a.getAttribute('data-price')) || 0;
+                    bVal = parseFloat(b.getAttribute('data-price')) || 0;
+                } else if (field === 'rating') {
+                    aVal = parseFloat(a.getAttribute('data-rating')) || 0;
+                    bVal = parseFloat(b.getAttribute('data-rating')) || 0;
+                }
+
+                if (order === 'asc') {
+                    return aVal - bVal;
+                } else {
+                    return bVal - aVal;
+                }
+            });
+
+            // DOMを再配置
+            itemsArray.forEach(function (item, index) {
+                item.classList.remove('fade-out');
+                item.style.animationDelay = (index * 0.05) + 's';
+                container.appendChild(item);
+            });
+
+            // アニメーション完了後にdelayをリセット
+            setTimeout(function () {
+                itemsArray.forEach(function (item) {
+                    item.style.animationDelay = '';
+                });
+            }, 500);
+        }, 200);
     }
 
     /**
