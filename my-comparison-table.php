@@ -25,6 +25,7 @@ define('MCT_VERSION', '2.1.0');
  */
 require_once MCT_PLUGIN_PATH . 'includes/class-mct-product.php';
 require_once MCT_PLUGIN_PATH . 'includes/class-mct-settings.php';
+require_once MCT_PLUGIN_PATH . 'includes/class-mct-ranking.php';
 
 /**
  * プラグイン初期化
@@ -33,6 +34,7 @@ function mct_init()
 {
     new MCT_Product();
     new MCT_Settings();
+    // MCT_Rankingはclass内で自動インスタンス化
 }
 add_action('plugins_loaded', 'mct_init');
 
@@ -215,17 +217,36 @@ function mct_comparison_table_shortcode($atts)
         'data' => '',
         'ids' => '',
         'category' => '',
+        'ranking_id' => '',
         'show_filter' => 'true',
         'show_sort' => 'true',
         'show_category_modal' => 'true',
+        'limit' => '',
     ), $atts, 'my_comparison_table');
 
     // データ取得方法を判定
     $data = array();
     $current_category = '';
 
+    // 0. ランキングID指定（管理画面で作成したランキング）
+    if (!empty($atts['ranking_id'])) {
+        $ranking_id = intval($atts['ranking_id']);
+        $data = MCT_Ranking::get_ranking_products($ranking_id);
+        
+        // ランキングのオプションを取得（ショートコードで上書きされていない場合）
+        $ranking_options = MCT_Ranking::get_ranking_options($ranking_id);
+        if ($atts['show_sort'] === 'true') {
+            $atts['show_sort'] = $ranking_options['show_sort'] ? 'true' : 'false';
+        }
+        if ($atts['show_filter'] === 'true') {
+            $atts['show_filter'] = $ranking_options['show_filter'] ? 'true' : 'false';
+        }
+        if (empty($atts['limit']) && $ranking_options['limit']) {
+            $atts['limit'] = $ranking_options['limit'];
+        }
+    }
     // 1. 商品ID指定
-    if (!empty($atts['ids'])) {
+    elseif (!empty($atts['ids'])) {
         $data = MCT_Product::get_products(array('ids' => $atts['ids']));
     }
     // 2. カテゴリー指定
@@ -240,6 +261,11 @@ function mct_comparison_table_shortcode($atts)
     // 4. 指定なしの場合は全商品
     else {
         $data = MCT_Product::get_products();
+    }
+
+    // 表示件数制限
+    if (!empty($atts['limit'])) {
+        $data = array_slice($data, 0, intval($atts['limit']));
     }
 
     if (!is_array($data) || empty($data)) {
